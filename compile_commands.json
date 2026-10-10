@@ -1,0 +1,94 @@
+[
+  {
+    "file": "app/main.c",
+    "arguments": [
+      "/opt/homebrew/bin/arm-none-eabi-gcc",
+      "-mcpu=cortex-m4",
+      "-mthumb",
+      "-g",
+      "-O0",
+      "-Wall",
+      "-DSTM32F411xE",
+      "-Ivendor/include",
+      "-Idrivers",
+      "-mcpu=cortex-m4",
+      "-mthumb",
+      "--specs=nano.specs",
+      "--specs=nosys.specs",
+      "app/main.c",
+      "-o",
+      "build/firmware.elf"
+    ],
+    "directory": "/Users/benjamintodd/Code/STM32-Display",
+    "output": "build/firmware.elf"
+  },
+  {
+    "file": "vendor/src/system_stm32f4xx.c",
+    "arguments": [
+      "/opt/homebrew/bin/arm-none-eabi-gcc",
+      "-mcpu=cortex-m4",
+      "-mthumb",
+      "-g",
+      "-O0",
+      "-Wall",
+      "-DSTM32F411xE",
+      "-Ivendor/include",
+      "-Idrivers",
+      "-mcpu=cortex-m4",
+      "-mthumb",
+      "--specs=nano.specs",
+      "--specs=nosys.specs",
+      "vendor/src/system_stm32f4xx.c",
+      "-o",
+      "build/firmware.elf"
+    ],
+    "directory": "/Users/benjamintodd/Code/STM32-Display",
+    "output": "build/firmware.elf"
+  },
+  {
+    "file": "vendor/src/startup_stm32f411xe.s",
+    "arguments": [
+      "/opt/homebrew/bin/arm-none-eabi-gcc",
+      "-mcpu=cortex-m4",
+      "-mthumb",
+      "-g",
+      "-O0",
+      "-Wall",
+      "-DSTM32F411xE",
+      "-Ivendor/include",
+      "-Idrivers",
+      "-mcpu=cortex-m4",
+      "-mthumb",
+      "--specs=nano.specs",
+      "--specs=nosys.specs",
+      "vendor/src/startup_stm32f411xe.s",
+      "-o",
+      "build/firmware.elf"
+    ],
+    "directory": "/Users/benjamintodd/Code/STM32-Display",
+    "output": "build/firmware.elf"
+  },
+  {
+    "file": "drivers/clock.c",
+    "arguments": [
+      "/opt/homebrew/bin/arm-none-eabi-gcc",
+      "-mcpu=cortex-m4",
+      "-mthumb",
+      "-g",
+      "-O0",
+      "-Wall",
+      "-DSTM32F411xE",
+      "-Ivendor/include",
+      "-Idrivers",
+      "-mcpu=cortex-m4",
+      "-mthumb",
+      "--specs=nano.specs",
+      "--specs=nosys.specs",
+      "drivers/clock.c",
+      "-o",
+      "build/firmware.elf"
+    ],
+    "directory": "/Users/benjamintodd/Code/STM32-Display",
+    "output": "build/firmware.elf"
+  }
+]
