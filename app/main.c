@@ -5,6 +5,6 @@ int main(void) {
     GPIOC->MODER |= (1 << (13 * 2));       // PC13 as output
     while (1) {
         GPIOC->ODR ^= (1 << 13);           // toggle LED
-        for (volatile int i = 0; i < 500000; i++);  // crude delay
+        for (volatile int i = 0; i < 2000000; i++);  // crude delay
     }
 }
