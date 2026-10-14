@@ -3,7 +3,7 @@ CFLAGS  = -mcpu=cortex-m4 -mthumb -g -O0 -Wall -DSTM32F411xE -Ivendor/include -I
 LDFLAGS = -mcpu=cortex-m4 -mthumb -T STM32F411CEUx_FLASH.ld --specs=nano.specs --specs=nosys.specs
 
 SRCS = app/main.c vendor/src/system_stm32f4xx.c vendor/src/startup_stm32f411xe.s \
-       drivers/clock.c drivers/systick.c drivers/uart.c drivers/i2c.c devices/bme280.c
+       drivers/clock.c drivers/systick.c drivers/uart.c drivers/i2c.c devices/bme280.c drivers/spi.c devices/st7789.c
 
 build/firmware.elf: $(SRCS)
 	mkdir -p build

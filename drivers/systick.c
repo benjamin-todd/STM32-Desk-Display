@@ -20,3 +20,5 @@ void delay_ms(uint32_t ms) {
     uint32_t start = ms_ticks;
     while ((ms_ticks - start) < ms);
 }
+
+uint32_t millis(void) { return ms_ticks; }
