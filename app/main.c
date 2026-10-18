@@ -2,29 +2,38 @@
 #include "clock.h"
 #include "systick.h"
 #include "uart.h"
+#include "i2c.h"
+#include "bme280.h"
 #include "st7789.h"
+#include "ui.h"
+
+#define BME280_ADDR 0x76
 
 int main(void) {
     clock_init();
     systick_init();
     uart_init();
-
-    uart_puts("\nScreen test\n");
+    i2c_init();
     st7789_init();
 
-    const uint16_t colors[] = { COLOR_RED, COLOR_GREEN, COLOR_BLUE, COLOR_WHITE, COLOR_BLACK };
+    uart_puts("\nDesk display\n");
+    if (bme280_init(BME280_ADDR)) {
+        uart_puts("BME280 not found\n");
+    }
 
     while (1) {
-        for (int i = 0; i < 5; i++) {
-            uint32_t start = millis();
-            st7789_fill_screen(colors[i]);
-            uint32_t took = millis() - start;
+        int32_t  temp = 0;
+        uint32_t hum  = 0;
+        bme280_read(&temp, &hum);
 
-            uart_puts("full-screen fill: ");
-            uart_put_uint(took);
-            uart_puts(" ms\n");
+        uint32_t start = millis();
+        ui_show_sensor(temp, hum);
+        uint32_t took = millis() - start;
 
-            delay_ms(1000);
-        }
+        uart_puts("redraw: ");
+        uart_put_uint(took);
+        uart_puts(" ms\n");
+
+        delay_ms(1000);
     }
 }

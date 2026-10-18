@@ -99,3 +99,13 @@ void st7789_fill_rect(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint16_t c
 void st7789_fill_screen(uint16_t color) {
     st7789_fill_rect(0, 0, ST7789_WIDTH, ST7789_HEIGHT, color);
 }
+
+// send a block of pixels that's already in memory in screen order
+// high byte first, which is why gfx.c stores its colors byte-swapped.
+void st7789_draw_pixels(uint16_t x, uint16_t y, uint16_t w, uint16_t h, const uint16_t *pixels) {
+    set_window(x, y, x + w - 1, y + h - 1);
+    DC_DATA();
+    CS_LOW();
+    spi_write((const uint8_t *)pixels, (uint32_t)w * h * 2);
+    CS_HIGH();
+}
