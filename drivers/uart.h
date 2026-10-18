@@ -8,5 +8,6 @@ void uart_putc(char c);
 void uart_puts(const char *s);
 void uart_put_uint(uint32_t n);
 void uart_put_int(int32_t n);
+int  uart_getc(void);   // next received character, or -1 if none
 
 #endif

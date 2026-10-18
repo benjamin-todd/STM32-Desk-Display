@@ -24,18 +24,22 @@ static void clear_strip(uint16_t color_swapped) {
     }
 }
 
-void gfx_render(uint16_t bg, void (*draw)(void)) {
+void gfx_render_rows(uint16_t bg, void (*draw)(void), int16_t y0, int16_t y1) {
     uint16_t bg_sw = swap_bytes(bg);
     int which = 0;
 
-    for (strip_y = 0; strip_y < ST7789_HEIGHT; strip_y += GFX_STRIP_H) {
+    if (y0 < 0) y0 = 0;
+    if (y1 > ST7789_HEIGHT) y1 = ST7789_HEIGHT;
+    y0 -= y0 % GFX_STRIP_H;                   // start at the strip that holds row y0
+
+    for (strip_y = y0; strip_y < y1; strip_y += GFX_STRIP_H) {
         strip = strip_bufs[which];
-        clear_strip(bg_sw);                   // 1. clear this strip
-        draw();                               // 2. draw into it (meanwhile the DMA sends the last one)
+        clear_strip(bg_sw);                   // clear this strip
+        draw();                               // draw into it (meanwhile the DMA sends the last one)
 #if GFX_USE_DMA
-        st7789_dma_wait();                    // 3. wait for the previous strip to finish sending
-        st7789_draw_pixels_dma(0, strip_y, ST7789_WIDTH, GFX_STRIP_H, strip);   // 4. start this one
-        which ^= 1;                           // 5. draw the next strip into the other buffer
+        st7789_dma_wait();                    // wait for the previous strip to finish sending
+        st7789_draw_pixels_dma(0, strip_y, ST7789_WIDTH, GFX_STRIP_H, strip);   // start this one
+        which ^= 1;                           // draw the next strip into the other buffer
 #else
         st7789_draw_pixels(0, strip_y, ST7789_WIDTH, GFX_STRIP_H, strip);       // CPU sends it all
 #endif
@@ -43,6 +47,10 @@ void gfx_render(uint16_t bg, void (*draw)(void)) {
 #if GFX_USE_DMA
     st7789_dma_wait();                        // let the last strip finish
 #endif
+}
+
+void gfx_render(uint16_t bg, void (*draw)(void)) {
+    gfx_render_rows(bg, draw, 0, ST7789_HEIGHT);
 }
 
 void gfx_fill_screen(uint16_t color) {

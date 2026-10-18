@@ -13,6 +13,10 @@
 // draw the whole screen: clears each strip to bg, calls draw(), sends the strip
 void gfx_render(uint16_t bg, void (*draw)(void));
 
+// same, but only redraws the strips that cover rows y0 up to (not including) y1.
+// much faster when only a small part of the screen changed.
+void gfx_render_rows(uint16_t bg, void (*draw)(void), int16_t y0, int16_t y1);
+
 // fill the whole screen with one color as fast as possible (for timing comparisons)
 void gfx_fill_screen(uint16_t color);
 

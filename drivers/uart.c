@@ -60,3 +60,10 @@ void uart_put_int(int32_t n) {
         uart_put_uint(n);
     }
 }
+
+int uart_getc(void) {
+    if (USART1->SR & USART_SR_RXNE) {        // a character has arrived
+        return USART1->DR & 0xFF;
+    }
+    return -1;
+}
