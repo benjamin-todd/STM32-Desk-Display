@@ -29,4 +29,5 @@ screen /dev/tty.usbserial-0001 115200   # serial output (macOS)
 Debugging: run openocd -f interface/stlink.cfg -f target/stm32f4x.cfg, then arm-none-eabi-gdb build/firmware.elf and target extended-remote :3333.
 
 Short Video Demo:
-<img width="1080" height="1920" alt="5600F48A-8000-48F0-A07A-FDCCE55D3712_1_102_o" src="https://github.com/user-attachments/assets/4bf2d1f0-3d2e-4793-a65a-d27b9b8e2039" />
+
+https://github.com/user-attachments/assets/2f6a69f9-1f80-45b3-a95b-55002cee7d36
