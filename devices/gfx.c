@@ -2,24 +2,59 @@
 #include "st7789.h"
 #include "font5x7.h"
 
-static uint16_t strip[ST7789_WIDTH * GFX_STRIP_H];
+#define STRIP_PIXELS (ST7789_WIDTH * GFX_STRIP_H)
+
+#if GFX_USE_DMA
+static uint16_t strip_bufs[2][STRIP_PIXELS];   // one is being sent while the other is drawn
+#else
+static uint16_t strip_bufs[1][STRIP_PIXELS];
+#endif
+static uint16_t *strip;    // the buffer the drawing functions write into right now
 static int16_t  strip_y;   // screen row where the current strip starts
 
 // the screen wants the high byte first, but this chip stores the low byte first in memory.
-// swapping once here means the buffer can be sent straight out (and later, by DMA).
+// swapping once here means the buffer can be sent straight out (and by DMA).
 static uint16_t swap_bytes(uint16_t c) {
     return (uint16_t)((c >> 8) | (c << 8));
 }
 
+static void clear_strip(uint16_t color_swapped) {
+    for (uint32_t i = 0; i < STRIP_PIXELS; i++) {
+        strip[i] = color_swapped;
+    }
+}
+
 void gfx_render(uint16_t bg, void (*draw)(void)) {
     uint16_t bg_sw = swap_bytes(bg);
+    int which = 0;
 
     for (strip_y = 0; strip_y < ST7789_HEIGHT; strip_y += GFX_STRIP_H) {
-        for (uint32_t i = 0; i < ST7789_WIDTH * GFX_STRIP_H; i++) {
-            strip[i] = bg_sw;                 // 1. clear the strip
-        }
-        draw();                               // 2. draw everything (only this strip's rows land)
-        st7789_draw_pixels(0, strip_y, ST7789_WIDTH, GFX_STRIP_H, strip);   // 3. send it
+        strip = strip_bufs[which];
+        clear_strip(bg_sw);                   // 1. clear this strip
+        draw();                               // 2. draw into it (meanwhile the DMA sends the last one)
+#if GFX_USE_DMA
+        st7789_dma_wait();                    // 3. wait for the previous strip to finish sending
+        st7789_draw_pixels_dma(0, strip_y, ST7789_WIDTH, GFX_STRIP_H, strip);   // 4. start this one
+        which ^= 1;                           // 5. draw the next strip into the other buffer
+#else
+        st7789_draw_pixels(0, strip_y, ST7789_WIDTH, GFX_STRIP_H, strip);       // CPU sends it all
+#endif
+    }
+#if GFX_USE_DMA
+    st7789_dma_wait();                        // let the last strip finish
+#endif
+}
+
+void gfx_fill_screen(uint16_t color) {
+    strip = strip_bufs[0];
+    clear_strip(swap_bytes(color));           // fill one strip buffer once...
+    for (int16_t y = 0; y < ST7789_HEIGHT; y += GFX_STRIP_H) {
+#if GFX_USE_DMA
+        st7789_draw_pixels_dma(0, y, ST7789_WIDTH, GFX_STRIP_H, strip);   // ...and send it 12 times
+        st7789_dma_wait();
+#else
+        st7789_draw_pixels(0, y, ST7789_WIDTH, GFX_STRIP_H, strip);
+#endif
     }
 }
 
@@ -65,6 +100,12 @@ void gfx_draw_text(int16_t x, int16_t y, const char *s, uint16_t color, uint8_t 
     }
 }
 
+// Which of the 7 segments are lit for each digit. Bit 0 = a (top), then b, c, d, e, f, g (middle).
+//    aaa
+//   f   b
+//    ggg
+//   e   c
+//    ddd
 static const uint8_t segments[10] = {
     0x3F, 0x06, 0x5B, 0x4F, 0x66, 0x6D, 0x7D, 0x07, 0x7F, 0x6F
 };

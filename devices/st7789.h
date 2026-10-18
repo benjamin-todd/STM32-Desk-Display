@@ -17,5 +17,7 @@ void st7789_init(void);
 void st7789_fill_rect(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint16_t color);
 void st7789_fill_screen(uint16_t color);
 void st7789_draw_pixels(uint16_t x, uint16_t y, uint16_t w, uint16_t h, const uint16_t *pixels);
+void st7789_draw_pixels_dma(uint16_t x, uint16_t y, uint16_t w, uint16_t h, const uint16_t *pixels);
+void st7789_dma_wait(void);
 
 #endif

@@ -101,11 +101,25 @@ void st7789_fill_screen(uint16_t color) {
 }
 
 // send a block of pixels that's already in memory in screen order
-// high byte first, which is why gfx.c stores its colors byte-swapped.
+// high byte first, which is why gfx.c stores its colors byte-swapped
 void st7789_draw_pixels(uint16_t x, uint16_t y, uint16_t w, uint16_t h, const uint16_t *pixels) {
     set_window(x, y, x + w - 1, y + h - 1);
     DC_DATA();
     CS_LOW();
     spi_write((const uint8_t *)pixels, (uint32_t)w * h * 2);
+    CS_HIGH();
+}
+
+// same as st7789_draw_pixels, but returns as soon as the DMA has started
+// call st7789_dma_wait() before sending anything else or changing the buffer
+void st7789_draw_pixels_dma(uint16_t x, uint16_t y, uint16_t w, uint16_t h, const uint16_t *pixels) {
+    set_window(x, y, x + w - 1, y + h - 1);
+    DC_DATA();
+    CS_LOW();
+    spi_write_dma_start((const uint8_t *)pixels, (uint16_t)((uint32_t)w * h * 2));
+}
+
+void st7789_dma_wait(void) {
+    spi_dma_wait();
     CS_HIGH();
 }
